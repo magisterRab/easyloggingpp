@@ -21,7 +21,7 @@ macro(require_cpp11)
         endif()
 endmacro()
 
-option(test "Build all tests" OFF)
+option(test "Build all tests" ON)
 option(build_static_lib "Build easyloggingpp as a static library" OFF)
 option(lib_utc_datetime "Build library with UTC date/time logging" OFF)
 
@@ -75,6 +75,7 @@ if (test)
 
     enable_testing()
 
+    set(CMAKE_CXX_FLAGS "-pthread")
     if (EMSCRIPTEN)
         set(CMAKE_EXE_LINKER_FLAGS "-O2 -s TOTAL_MEMORY=134217728")
     endif()
@@ -89,6 +90,8 @@ if (test)
         ELPP_LOGGING_FLAGS_FROM_ARG
         ELPP_NO_DEFAULT_LOG_FILE
         ELPP_FRESH_LOG_FILE
+        ELPP_SYSLOG
+        ELPP_STL_LOGGING
     )
 
     # Standard linking to gtest stuff.
