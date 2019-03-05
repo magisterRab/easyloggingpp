@@ -876,18 +876,6 @@ static inline base::type::EnumType Or(Enum e, base::type::EnumType flag) {
   return static_cast<base::type::EnumType>(flag) | static_cast<base::type::EnumType>(e);
 }
 }  // namespace bitwise
-template <typename Enum>
-static inline void addFlag(Enum e, base::type::EnumType* flag) {
-  *flag = base::utils::bitwise::Or<Enum>(e, *flag);
-}
-template <typename Enum>
-static inline void removeFlag(Enum e, base::type::EnumType* flag) {
-  *flag = base::utils::bitwise::Not<Enum>(e, *flag);
-}
-template <typename Enum>
-static inline bool hasFlag(Enum e, base::type::EnumType flag) {
-  return base::utils::bitwise::And<Enum>(e, flag) > 0x0;
-}
 }  // namespace utils
 namespace threading {
 #if ELPP_THREADING_ENABLED
@@ -1605,9 +1593,7 @@ class LogFormat : public Loggable {
     return m_flags;
   }
 
-  inline bool hasFlag(base::FormatFlags flag) const {
-    return base::utils::hasFlag(flag, m_flags);
-  }
+  bool hasFlag(base::FormatFlags flag) const;
 
   virtual void log(el::base::type::ostream_t& os) const {
     os << m_format;
@@ -1622,9 +1608,7 @@ class LogFormat : public Loggable {
   /// @brief Updates %level from format. This is so that we dont have to do it at log-writing-time. It uses m_format and m_level
   virtual void updateFormatSpec(void) ELPP_FINAL;
 
-  inline void addFlag(base::FormatFlags flag) {
-    base::utils::addFlag(flag, &m_flags);
-  }
+  void addFlag(base::FormatFlags flag);
 
  private:
   Level m_level;
@@ -2439,9 +2423,7 @@ class VRegistry : base::NoCopy, public base::threading::ThreadSafe {
   void setFromArgs(const base::utils::CommandLineArgs* commandLineArgs);
 
   /// @brief Whether or not vModules enabled
-  inline bool vModulesEnabled(void) {
-    return !base::utils::hasFlag(LoggingFlag::DisableVModules, *m_pFlags);
-  }
+  bool vModulesEnabled(void);
 
  private:
   base::type::VerboseLevel m_level;
@@ -2590,17 +2572,11 @@ class Storage : base::NoCopy, public base::threading::ThreadSafe {
     return &m_commandLineArgs;
   }
 
-  inline void addFlag(LoggingFlag flag) {
-    base::utils::addFlag(flag, &m_flags);
-  }
+  void addFlag(LoggingFlag flag);
 
-  inline void removeFlag(LoggingFlag flag) {
-    base::utils::removeFlag(flag, &m_flags);
-  }
+  void removeFlag(LoggingFlag flag);
 
-  inline bool hasFlag(LoggingFlag flag) const {
-    return base::utils::hasFlag(flag, m_flags);
-  }
+  bool hasFlag(LoggingFlag flag) const;
 
   inline base::type::EnumType flags(void) const {
     return m_flags;

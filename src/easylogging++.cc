@@ -126,7 +126,45 @@ static void abort(int status, const std::string& reason) {
 #endif  // defined(ELPP_COMPILER_MSVC) && defined(_M_IX86) && defined(_DEBUG)
 }
 
+template <typename Enum>
+static inline void addFlag(Enum e, base::type::EnumType* flag) {
+    *flag = base::utils::bitwise::Or<Enum>(e, *flag);
+}
+template <typename Enum>
+static inline void removeFlag(Enum e, base::type::EnumType* flag) {
+    *flag = base::utils::bitwise::Not<Enum>(e, *flag);
+}
+template <typename Enum>
+static inline bool hasFlag(Enum e, base::type::EnumType flag) {
+    return base::utils::bitwise::And<Enum>(e, flag) > 0x0;
+}
+
 } // namespace utils
+
+bool VRegistry::vModulesEnabled() {
+    return !base::utils::hasFlag(LoggingFlag::DisableVModules, *m_pFlags);
+}
+
+void LogFormat::addFlag(FormatFlags flag) {
+    base::utils::addFlag(flag, &m_flags);
+}
+
+bool LogFormat::hasFlag(FormatFlags flag) const {
+    return base::utils::hasFlag(flag, m_flags);
+}
+
+void Storage::addFlag(LoggingFlag flag) {
+    base::utils::addFlag(flag, &m_flags);
+}
+
+void Storage::removeFlag(LoggingFlag flag) {
+    base::utils::removeFlag(flag, &m_flags);
+}
+
+bool Storage::hasFlag(LoggingFlag flag) const {
+    return base::utils::hasFlag(flag, m_flags);
+}
+
 } // namespace base
 
 // el
